@@ -1,2 +1,5 @@
-
+data/*
+work_dirs/*
 .DS_Store
+projects/**/__pycache__
+tools/**/__pycache__

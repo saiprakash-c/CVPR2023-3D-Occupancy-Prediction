@@ -3,3 +3,8 @@ work_dirs/*
 .DS_Store
 projects/**/__pycache__
 tools/**/__pycache__
+data/annotations.json
+data/gts.tar.gz
+data/imgs.tar.gz
+data/**/*.npz
+data/**/*.jpg

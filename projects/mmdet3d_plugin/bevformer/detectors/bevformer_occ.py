@@ -15,6 +15,21 @@ import copy
 import numpy as np
 import mmdet3d
 from projects.mmdet3d_plugin.models.utils.bricks import run_time
+import pdb
+import inspect
+
+def print_gpu_memory():
+    # Get the current frame
+    frame = inspect.currentframe()
+    # Go back one level to the caller
+    frame = frame.f_back
+    info = inspect.getframeinfo(frame)
+
+    # Get the current GPU memory usage
+    gpu_memory = torch.cuda.memory_allocated()
+
+    # Print the information
+    print(f'File: {info.filename}, Function: {info.function}, Line: {info.lineno}, GPU Memory: {gpu_memory} bytes')
 
 
 @DETECTORS.register_module()
@@ -80,15 +95,18 @@ class BEVFormerOcc(MVXTwoStageDetector):
                 img = img.reshape(B * N, C, H, W)
             if self.use_grid_mask:
                 img = self.grid_mask(img)
-
+            #print_gpu_memory()
+            
             img_feats = self.img_backbone(img)
+            #print_gpu_memory()
             if isinstance(img_feats, dict):
                 img_feats = list(img_feats.values())
         else:
             return None
+        #print_gpu_memory()
         if self.with_img_neck:
             img_feats = self.img_neck(img_feats)
-
+        #print_gpu_memory()
         img_feats_reshaped = []
         for img_feat in img_feats:
             BN, C, H, W = img_feat.size()
@@ -216,23 +234,27 @@ class BEVFormerOcc(MVXTwoStageDetector):
         Returns:
             dict: Losses of different branches.
         """
-
+        # pdb.set_trace()
+        #print_gpu_memory()
         len_queue = img.size(1)
         prev_img = img[:, :-1, ...]
         img = img[:, -1, ...]
 
         prev_img_metas = copy.deepcopy(img_metas)
         prev_bev = self.obtain_history_bev(prev_img, prev_img_metas)
-
+        
+        #print_gpu_memory()
         img_metas = [each[len_queue - 1] for each in img_metas]
         if not img_metas[0]['prev_bev_exists']:
             prev_bev = None
+        #print_gpu_memory()
         img_feats = self.extract_feat(img=img, img_metas=img_metas)
+        #print_gpu_memory()
         losses = dict()
         losses_pts = self.forward_pts_train(img_feats, gt_bboxes_3d,
                                             gt_labels_3d, voxel_semantics, mask_camera, img_metas,
                                             gt_bboxes_ignore, prev_bev)
-
+        #print_gpu_memory()
         losses.update(losses_pts)
         return losses
 

@@ -141,9 +141,9 @@ model = dict(
             pc_range=point_cloud_range)))))
 
 dataset_type = 'NuSceneOcc'
-data_root = 'data/occ3d-nus/'
+data_root = 'data/occ3d-nus-train/'
 file_client_args = dict(backend='disk')
-occ_gt_data_root='data/occ3d-nus'
+occ_gt_data_root='data/occ3d-nus-train'
 
 train_pipeline = [
     dict(type='LoadMultiViewImageFromFiles', to_float32=True),
